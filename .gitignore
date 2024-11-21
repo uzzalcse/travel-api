@@ -1,0 +1,48 @@
+# Byte-compiled / optimized / compiled Python files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+env/
+venv/
+ENV/
+.venv/
+my-venv/
+
+# Flask-related files
+instance/
+*.db
+*.sqlite3
+
+# Log files
+*.log
+*.pot
+
+# Local environment variables
+.env
+.env.*
+config.py
+
+# Cache and debug files
+.cache/
+*.pyc
+*.pyo
+
+# Static files
+staticfiles/
+media/
+
+# Flask extensions
+*.migrations/
+
+# IDE/Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# System files
+.DS_Store
+Thumbs.db
