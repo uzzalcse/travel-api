@@ -3,7 +3,7 @@
 # Clone the project
 
 ```
-https://github.com/uzzalcse/travel-api.git
+git clone https://github.com/uzzalcse/travel-api.git
 
 ```
 
