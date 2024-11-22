@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restx import Api
-from controllers.auth_controller import auth_namespace  # Import the auth controller namespace
+from controllers.destination_controller import destination_namespace  # Import the destination controller namespace
 
 # Define authorizations for JWT Bearer token
 authorizations = {
@@ -19,14 +19,14 @@ app = Flask(__name__)
 api = Api(
     app,
     version="1.0",
-    title="Authentication Service API",
-    description="API for validating tokens and checking user roles",
+    title="Destination Service API",
+    description="API for managing destinations (adding, viewing)",
     authorizations=authorizations,  # Add authorizations here
     security='Bearer'  # Apply Bearer token globally
 )
 
-# Register the auth namespace
-api.add_namespace(auth_namespace, path="/auth")
+# Register the destination namespace
+api.add_namespace(destination_namespace, path="/destination")
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5004)
+    app.run(debug=True, port=5005)

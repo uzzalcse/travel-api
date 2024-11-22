@@ -1,14 +1,32 @@
-from flask_restx import Namespace, Resource, fields
+
+from flask import Flask, request
+from flask_restx import Api, Namespace, Resource, fields
 import uuid
 from datetime import datetime, timedelta
 from jose import jwt
 from utils.password_utils import hash_password, verify_password
 
-# Mock user data for this example (you can replace this with a database)
-USERS = []
+# Mocked user data for simplicity (Replace with database in production)
+USERS = [
+    {
+        "id": "some-uuid",
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "password": hash_password("admin123"),  # Replace with pre-hashed password
+        "role": "Admin"
+    }
+]
 
-# Define user namespace
+# Secret key for JWT
+SECRET_KEY = "your_secret_key"
+
+# Initialize Flask app and API
+app = Flask(__name__)
+api = Api(app)
+
+# User Namespace
 user_namespace = Namespace('user', description="User-related operations")
+api.add_namespace(user_namespace, path='/user')
 
 # Swagger Models
 register_model = user_namespace.model(
@@ -39,10 +57,7 @@ profile_model = user_namespace.model(
     },
 )
 
-# Secret key for JWT (make sure to replace with a real secret key)
-SECRET_KEY = "your_secret_key"
 
-# JWT Token required decorator
 def token_required(f):
     def decorated(*args, **kwargs):
         token = None
@@ -61,23 +76,27 @@ def token_required(f):
             current_user = next((user for user in USERS if user['id'] == data['user_id']), None)
             if current_user is None:
                 return {'message': 'Invalid token. User not found.'}, 401
+
+            print(f"Token Decoded Data: {data}")  # Debugging
+            print(f"Current User: {current_user}")  # Debugging
+            
+            # Pass `current_user` as a keyword argument
+            return f(current_user=dict(current_user), *args, **kwargs)
         except jwt.ExpiredSignatureError:
             return {'message': 'Token has expired.'}, 401
         except jwt.JWTError:
             return {'message': 'Invalid token.'}, 401
-        return f(current_user, *args, **kwargs)
     return decorated
 
-# Register user
+
+
+# User Registration Endpoint
 @user_namespace.route("/register")
 class Register(Resource):
     @user_namespace.expect(register_model)
     @user_namespace.response(201, "User registered successfully", profile_model)
     @user_namespace.response(400, "Email already registered")
     def post(self):
-        """
-        Register a new user
-        """
         data = user_namespace.payload
         email = data.get("email")
         if any(user["email"] == email for user in USERS):
@@ -96,16 +115,14 @@ class Register(Resource):
         USERS.append(new_user)
         return {"id": user_id, "name": data["name"], "email": email, "role": new_user["role"]}, 201
 
-# Login user
+
+# User Login Endpoint
 @user_namespace.route("/login")
 class Login(Resource):
     @user_namespace.expect(login_model)
     @user_namespace.response(200, "Login successful")
     @user_namespace.response(400, "Invalid email or password")
     def post(self):
-        """
-        Authenticate a user and return a JWT token
-        """
         data = user_namespace.payload
         email = data.get("email")
         password = data.get("password")
@@ -125,77 +142,39 @@ class Login(Resource):
         )
         return {"token": token}, 200
 
-# Get user profile
-# @user_namespace.route("/profile")
-# class Profile(Resource):
-#     @user_namespace.doc(security='Bearer')  # This links to the API security definition
-#     @user_namespace.response(200, "Profile retrieved successfully", profile_model)
-#     @user_namespace.response(401, "Unauthorized")
-#     @user_namespace.response(404, "User not found")
-#     @user_namespace.param('user_id', 'User ID to fetch profile (optional)', _in='query')
-#     @token_required
-#     def get(self, current_user):
-#         """
-#         Get the profile of a user by their ID or token
-#         """
-#         user_id = request.args.get("user_id")
-        
-#         if user_id:
-#             # If user_id is provided, check if the current user has permission to view it
-#             if current_user['role'] != 'Admin' and current_user['id'] != user_id:
-#                 return {"error": "Unauthorized to view this profile"}, 401
-            
-#             user = next((user for user in USERS if user["id"] == user_id), None)
-#         else:
-#             # If no user_id is provided, return the current user's profile
-#             user = current_user
 
-#         if not user:
-#             return {"error": "User not found"}, 404
-
-#         return {
-#             "id": user["id"],
-#             "name": user["name"],
-#             "email": user["email"],
-#             "role": user["role"]
-#         }, 200
-
-
+# User Profile Endpoint
 @user_namespace.route("/profile")
 class Profile(Resource):
-    @user_namespace.doc(security='Bearer')  # This links to the API security definition
+    @user_namespace.doc(security='Bearer')
     @user_namespace.response(200, "Profile retrieved successfully", profile_model)
     @user_namespace.response(401, "Unauthorized")
     @user_namespace.response(404, "User not found")
     @user_namespace.param('user_id', 'User ID to fetch profile (optional)', _in='query')
     @token_required
     def get(self, current_user):
-        """
-        Get the profile of a user by their ID or token
-        """
-        try:
-            user_id = request.args.get("user_id")  # Fetch 'user_id' from query params
-            
-            if user_id:
-                # If user_id is provided, check if the current user has permission to view it
-                if current_user['role'] != 'Admin' and current_user['id'] != user_id:
-                    return {"error": "Unauthorized to view this profile"}, 401
-                
-                # Fetch the user based on the user_id
-                user = next((user for user in USERS if user["id"] == user_id), None)
-            else:
-                # If no user_id is provided, return the current user's profile
-                user = current_user
+        print(f"Current User in Profile: {current_user}")  # Debugging
+        print(f"Current User Type: {type(current_user)}")  # Debugging
 
-            if not user:
-                return {"error": "User not found"}, 404
+        user_id = request.args.get("user_id")
 
-            return {
-                "id": user["id"],
-                "name": user["name"],
-                "email": user["email"],
-                "role": user["role"]
-            }, 200
-        except Exception as e:
-            # Log the exception for debugging purposes
-            return {"error": f"An error occurred: {str(e)}"}, 500
+        print(current_user)
+
+        if user_id:
+            if current_user['role'] != 'Admin' and current_user['id'] != user_id:
+                return {"error": "Unauthorized to view this profile"}, 401
+
+            user = next((user for user in USERS if user["id"] == user_id), None)
+        else:
+            user = current_user
+
+        if not user:
+            return {"error": "User not found"}, 404
+
+        return {
+            "id": user["id"],
+            "name": user["name"],
+            "email": user["email"],
+            "role": user["role"]
+        }, 200
+

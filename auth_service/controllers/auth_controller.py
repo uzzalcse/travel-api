@@ -1,46 +1,56 @@
-import jwt
-from datetime import datetime, timedelta
-from flask import request, jsonify
-from user_service.services.user_service import login_user
-from auth_service.utils.decorators import SECRET_KEY  # The shared secret key for JWT encoding
+from flask import request
+from flask_restx import Namespace, Resource, fields
+from jose import jwt
 
-def login():
-    """
-    Handles user login and generates a JWT token.
-    """
-    try:
-        data = request.json
-        token = login_user(data)  # Get the token after validating user login
-        return jsonify({"token": token}), 200
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+# Secret key for JWT
+SECRET_KEY = "your_secret_key"
 
+# Define the Namespace
+auth_namespace = Namespace("auth", description="Authentication and Role Validation")
 
-def validate_token():
-    """
-    Validates the JWT token in the request header.
-    """
-    try:
-        token = request.headers.get('Authorization').split()[1]  # Get token from Authorization header
-        decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+# Swagger Models
+token_validation_model = auth_namespace.model(
+    "TokenValidation",
+    {
+        "token": fields.String(required=True, description="JWT token to validate")
+    },
+)
 
-        # Add user_id and role to request context for role-based access control
-        request.user_id = decoded["user_id"]
-        request.role = decoded["role"]
+role_response_model = auth_namespace.model(
+    "RoleResponse",
+    {
+        "user_id": fields.String(description="User ID"),
+        "role": fields.String(description="User role (Admin/User)"),
+    },
+)
 
-        return True  # Token is valid
-    except (IndexError, jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
-        return jsonify({"error": "Invalid or expired token"}), 401
-
-
-def role_required(role):
-    """
-    Decorator that checks if the user has the correct role (Admin or User).
-    """
-    def decorator(f):
-        def wrapper(*args, **kwargs):
-            if request.role != role:
-                return jsonify({"error": "Access forbidden: insufficient role"}), 403
-            return f(*args, **kwargs)
-        return wrapper
-    return decorator
+# Token Validation Endpoint
+@auth_namespace.route("/validate")
+class TokenValidation(Resource):
+    @auth_namespace.expect(token_validation_model)
+    @auth_namespace.response(200, "Token validated successfully", role_response_model)
+    @auth_namespace.response(401, "Invalid or expired token")
+    def post(self):
+        """
+        Validate the provided JWT token and return the user's role.
+        """
+        data = auth_namespace.payload
+        token = data.get("token")
+        
+        if not token:
+            return {"error": "Token is missing."}, 401
+        
+        try:
+            # Decode the JWT token
+            decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            user_id = decoded.get("user_id")
+            role = decoded.get("role")
+            
+            if not user_id or not role:
+                return {"error": "Invalid token payload."}, 401
+            
+            return {"user_id": user_id, "role": role}, 200
+        except jwt.ExpiredSignatureError:
+            return {"error": "Token has expired."}, 401
+        except jwt.JWTError:
+            return {"error": "Invalid token."}, 401
