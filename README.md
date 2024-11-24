@@ -48,6 +48,41 @@ The Travel API consists of three main microservices:
 - `POST /auth/validate`: Validate a new user whether a user or admin.
   - **Role-based Access**: Ensure Admins have access to specific actions (e.g., destination management).
 
+
+
+# Travel API Microservices  
+
+## Project Structure  
+
+📁 travel-api  
+├── 📁 destination_service  
+│   ├── 📁 controllers  
+│   │   └── 📄 destination_controller.py  
+│   ├── 📁 tests  
+│   │   └── 📄 test_destination_controller.py  
+│   └── 📄 app.py  
+│  
+├── 📁 user_service  
+│   ├── 📁 controllers  
+│   │   └── 📄 user_controller.py  
+│   ├── 📁 utils  
+│   │   └── 📄 password_utils.py  
+│   ├── 📁 tests  
+│   │   └── 📄 test_user_controller.py  
+│   └── 📄 app.py  
+│  
+├── 📁 auth_service  
+│   ├── 📁 controllers  
+│   │   └── 📄 auth_controller.py  
+│   ├── 📁 tests  
+│   │   └── 📄 test_auth_controller.py  
+│   └── 📄 app.py  
+│  
+├── 📄 app.py  
+├── 📄 requirements.txt  
+└── 📄 .gitignore
+
+
 ## Features & Requirements
 
 ### User Authentication Expansion:
