@@ -3,6 +3,9 @@ from flask import Flask, request
 from flask_restx import Api, Namespace, Resource, fields
 import uuid
 from datetime import datetime, timedelta
+from datetime import datetime, timezone
+datetime.now(timezone.utc)
+
 from jose import jwt
 from utils.password_utils import hash_password, verify_password
 
@@ -135,7 +138,8 @@ class Login(Resource):
             {
                 "user_id": user["id"],
                 "role": user["role"],
-                "exp": datetime.utcnow() + timedelta(hours=1)
+                #"exp": datetime.utcnow() + timedelta(hours=1)
+                "exp": datetime.now(timezone.utc) + timedelta(hours=1)
             },
             SECRET_KEY,
             algorithm="HS256"

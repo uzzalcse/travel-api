@@ -1,3 +1,9 @@
+import warnings
+
+# Ignore deprecation warnings in the app
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
 from flask import Flask
 from flask_restx import Api
 from controllers.auth_controller import auth_namespace  # Import the auth controller namespace
