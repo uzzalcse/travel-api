@@ -9,8 +9,6 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="flask_restx")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="jsonschema")
 
-
-
 # Secret key for JWT (shared across services for token validation)
 SECRET_KEY = "your_secret_key"
 
@@ -102,6 +100,7 @@ class ManageDestinations(Resource):
     @destination_namespace.response(201, "Destination created successfully", destination_model)
     @destination_namespace.response(403, "Forbidden: Only Admins can create destinations")
     @destination_namespace.response(401, "Unauthorized: Invalid or missing token")
+    @destination_namespace.response(400, "Invalid input: Name and description cannot be null or empty")
     @destination_namespace.expect(create_destination_model)  # Expect a JSON body
     def post(self):
         """
@@ -124,13 +123,22 @@ class ManageDestinations(Resource):
 
         # Parse and validate the request body
         data = request.json
+        name = data.get("name")
+        description = data.get("description")
+
+        # Validate that name and description are not null or empty
+        if not name or not name.strip():
+            return {"error": "Invalid input: Destination name cannot be null or empty."}, 400
+        if not description or not description.strip():
+            return {"error": "Invalid input: Destination description cannot be null or empty."}, 400
+
+        # Create the new destination
         new_destination = {
             "id": str(uuid.uuid4()),  # Generate a unique UUID for the destination
-            "name": data["name"],
-            "description": data["description"],
+            "name": name.strip(),
+            "description": description.strip(),
         }
         DESTINATIONS.append(new_destination)  # Add the destination
-        print(DESTINATIONS)
         return new_destination, 201
 
 # **DELETE** Endpoint: Delete a specific destination (Admin-only)

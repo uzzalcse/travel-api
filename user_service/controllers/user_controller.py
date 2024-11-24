@@ -1,11 +1,9 @@
 
+
 from flask import Flask, request
 from flask_restx import Api, Namespace, Resource, fields
 import uuid
-from datetime import datetime, timedelta
-from datetime import datetime, timezone
-datetime.now(timezone.utc)
-
+from datetime import datetime, timedelta, timezone
 from jose import jwt
 from utils.password_utils import hash_password, verify_password
 
@@ -80,10 +78,6 @@ def token_required(f):
             if current_user is None:
                 return {'message': 'Invalid token. User not found.'}, 401
 
-            print(f"Token Decoded Data: {data}")  # Debugging
-            print(f"Current User: {current_user}")  # Debugging
-            
-            # Pass `current_user` as a keyword argument
             return f(current_user=dict(current_user), *args, **kwargs)
         except jwt.ExpiredSignatureError:
             return {'message': 'Token has expired.'}, 401
@@ -92,28 +86,44 @@ def token_required(f):
     return decorated
 
 
-
 # User Registration Endpoint
 @user_namespace.route("/register")
 class Register(Resource):
     @user_namespace.expect(register_model)
     @user_namespace.response(201, "User registered successfully", profile_model)
-    @user_namespace.response(400, "Email already registered")
+    @user_namespace.response(400, "Invalid input")
     def post(self):
         data = user_namespace.payload
+
+        # Validate email format
         email = data.get("email")
+        if not email or not "@" in email or not "." in email.split("@")[-1]:
+            return {"error": "Invalid email format"}, 400
+
+        # Validate email uniqueness
         if any(user["email"] == email for user in USERS):
             return {"error": "Email already registered"}, 400
 
+        # Validate password
+        password = data.get("password")
+        if not password or len(password.strip()) == 0:
+            return {"error": "Password cannot be empty"}, 400
+
+        # Validate role
+        role = data.get("role", "User")
+        if role not in ["Admin", "User"]:
+            return {"error": "Role must be 'Admin' or 'User'"}, 400
+
+        # If validation passes, register the user
         user_id = str(uuid.uuid4())
-        hashed_password = hash_password(data["password"])
+        hashed_password = hash_password(password)
 
         new_user = {
             "id": user_id,
             "name": data["name"],
             "email": email,
             "password": hashed_password,
-            "role": data.get("role", "User"),
+            "role": role,
         }
         USERS.append(new_user)
         return {"id": user_id, "name": data["name"], "email": email, "role": new_user["role"]}, 201
@@ -138,7 +148,6 @@ class Login(Resource):
             {
                 "user_id": user["id"],
                 "role": user["role"],
-                #"exp": datetime.utcnow() + timedelta(hours=1)
                 "exp": datetime.now(timezone.utc) + timedelta(hours=1)
             },
             SECRET_KEY,
@@ -157,12 +166,7 @@ class Profile(Resource):
     @user_namespace.param('user_id', 'User ID to fetch profile (optional)', _in='query')
     @token_required
     def get(self, current_user):
-        print(f"Current User in Profile: {current_user}")  # Debugging
-        print(f"Current User Type: {type(current_user)}")  # Debugging
-
         user_id = request.args.get("user_id")
-
-        print(current_user)
 
         if user_id:
             if current_user['role'] != 'Admin' and current_user['id'] != user_id:
@@ -181,4 +185,6 @@ class Profile(Resource):
             "email": user["email"],
             "role": user["role"]
         }, 200
+
+
 
