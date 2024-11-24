@@ -69,35 +69,35 @@ The Travel API consists of three main microservices:
 
 ### Installation
 
-# Clone the project repository
+#### Clone the project repository
 
 ```
 git clone https://github.com/uzzalcse/travel-api.git
 
 ```
 
-# Go to the project directory 
+#### Go to the project directory 
 
 ```
 cd travel-api
 
 ```
 
-# Creating virtual environment 
+#### Creating virtual environment 
 
 ```
 python -m venv venv
 
 ```
 
-# Go to the virtual environment
-## In Windows
+#### Go to the virtual environment
+##### In Windows
 ```
 venv\Scripts\activate
 
 ```
 
-### In Mac/Linus
+###### In Mac/Linus
 
 ```
 source/bin/activate
@@ -105,15 +105,15 @@ source/bin/activate
 ```
 
 
-# Now install  dependencies in virtual environment
+#### Now install  dependencies in virtual environment
 
 ```
 pip install -r requirements.txt
 
 ```
-# To run each service go to that service directory
+#### To run each service go to that service directory
 
-## To run auth service go to the auth_service directory using the following command from project root directory
+##### To run auth service go to the auth_service directory using the following command from project root directory
 
 ``` 
 cd auth_service
@@ -121,12 +121,12 @@ python app.py
 
 ```
 
-### Follow the link to see the results
+###### Follow the link to see the results
 
 
 http://127.0.0.1:5001/
 
-### To run tests for auth service run the follwing commands (You have to run this command from auth_service directory)
+###### To run tests for auth service run the follwing commands (You have to run this command from auth_service directory)
 
 ```
 pytest --cov=controllers --cov=app --cov-report=term-missing
@@ -135,7 +135,7 @@ pytest --cov=controllers --cov=app --cov-report=term-missing
 
 
 
-## To run destination service go to the destination_service directory using the following command from project root directory
+##### To run destination service go to the destination_service directory using the following command from project root directory
 
 ```
 cd destination_service
@@ -143,11 +143,11 @@ python app.py
 
 ```
 
-### Follow the link to see the results
+###### Follow the link to see the results
 http://127.0.0.1:5002/
 
 
-### To run tests for destination service run the follwing commands (You have to run this command from destination_service directory)
+###### To run tests for destination service run the follwing commands (You have to run this command from destination_service directory)
 
 ```
 pytest --cov=controllers --cov=app --cov-report=term-missing
@@ -155,7 +155,7 @@ pytest --cov=controllers --cov=app --cov-report=term-missing
 ```
 
 
-## To run user service go to the user_service directory using the following command from project root directory
+##### To run user service go to the user_service directory using the following command from project root directory
 
 ```
 cd user_service
@@ -163,11 +163,11 @@ cd user_service
 python app.py
 
 ```
-### Follow the link to see the results
+###### Follow the link to see the results
 http://127.0.0.1:5003/
 
 
-### To run tests for user service run the follwing commands (You have to run this command from user_service directory)
+###### To run tests for user service run the follwing commands (You have to run this command from user_service directory)
 
 ```
 pytest --cov=controllers --cov=app --cov-report=term-missing
