@@ -1,13 +1,12 @@
 
 
 
-import warnings
-
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="flask_restx")
 
 from flask import Flask
 from flask_restx import Api
 from controllers.user_controller import user_namespace  # Import the user controller namespace
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="flask_restx")
 
 # Define authorizations for JWT Bearer token
 authorizations = {
