@@ -5,6 +5,11 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 from jose import jwt
 
+import warnings
+
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="flask_restx.api")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="jsonschema")
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # Secret key for JWT

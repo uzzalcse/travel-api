@@ -7,6 +7,10 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 from flask import Flask
 from flask_restx import Api
 from controllers.auth_controller import auth_namespace  # Import the auth controller namespace
+import warnings
+
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="flask_restx")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="jose.jwt")
 
 # Define authorizations for JWT Bearer token
 authorizations = {
@@ -35,4 +39,4 @@ api = Api(
 api.add_namespace(auth_namespace, path="/auth")
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5004)
+    app.run(debug=True, port=5001)

@@ -9,7 +9,12 @@ from app import app as flask_app
 from jose import jwt
 import uuid
 
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+import warnings
+
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="flask_restx")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="jsonschema")
+
+
 
 
 # Set up a mock valid JWT token

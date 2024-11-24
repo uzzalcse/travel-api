@@ -36,4 +36,4 @@ api = Api(
 api.add_namespace(user_namespace, path="/user")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5003)

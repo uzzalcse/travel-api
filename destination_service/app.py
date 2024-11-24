@@ -1,6 +1,12 @@
+
+
 from flask import Flask
 from flask_restx import Api
 from controllers.destination_controller import destination_namespace  # Import the destination controller namespace
+import warnings
+
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="flask_restx")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="jsonschema")
 
 # Define authorizations for JWT Bearer token
 authorizations = {
@@ -29,4 +35,4 @@ api = Api(
 api.add_namespace(destination_namespace, path="/destination")
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5005)
+    app.run(debug=True, port=5002)

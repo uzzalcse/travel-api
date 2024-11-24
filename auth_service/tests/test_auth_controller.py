@@ -7,7 +7,9 @@ from jose import jwt
 from app import app
 from controllers.auth_controller import auth_namespace
 import warnings
+
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="flask_restx")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="jose.jwt")
 
 # Secret key for JWT (same as in auth_controller.py)
 SECRET_KEY = "your_secret_key"

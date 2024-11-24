@@ -4,6 +4,12 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 from jose import jwt
 import uuid  # Import the uuid module to generate unique IDs
+import warnings
+
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="flask_restx")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="jsonschema")
+
+
 
 # Secret key for JWT (shared across services for token validation)
 SECRET_KEY = "your_secret_key"
