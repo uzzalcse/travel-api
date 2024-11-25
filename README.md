@@ -121,6 +121,12 @@ cd travel-api
 #### Creating virtual environment 
 
 ```
+python3 -m venv venv
+
+```
+#### If the previous (for creating virtual environment) command does not work 
+
+```
 python -m venv venv
 
 ```
@@ -132,10 +138,10 @@ venv\Scripts\activate
 
 ```
 
-###### In Mac/Linus
+###### In Mac/Linux
 
 ```
-source/bin/activate
+source venv/bin/activate
 
 ```
 
