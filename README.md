@@ -165,7 +165,12 @@ python app.py
 ###### Follow the link to see the results
 
 
-http://127.0.0.1:5001/
+http://127.0.0.1:5001/  
+First authorize using token which is given at the time of log in.  
+You have to authorize from swagger ui using a button 'Authorize'.  
+Clicking authorize it will show a pop up window.  
+In the text box insert token with the word 'Bearer' 
+If the token is correct it will show the user role. 
 
 ###### To run tests for auth service run the follwing commands (You have to run this command from auth_service directory)
 
